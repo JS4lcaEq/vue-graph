@@ -1,0 +1,1 @@
+import{_ as e,p as t,u as n}from"./index-DE4mLGp1.js";import{t as r}from"./_plugin-vue_export-helper-CSBScHBl.js";var i={},a={id:`about`};function o(r,i){return e(),t(`div`,a,[...i[0]||=[n(`h1`,null,`This is an about page`,-1)]])}var s=r(i,[[`render`,o]]);export{s as default};
