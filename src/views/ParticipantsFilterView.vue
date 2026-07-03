@@ -16,34 +16,14 @@
             @row-click="selectFilter"
           >
             <el-table-column prop="id" label="ID" width="70" />
-            <el-table-column label="Роль в деле" min-width="160">
+            <el-table-column
+              v-for="field in filterFieldConfigs"
+              :key="field.key"
+              :label="field.label"
+              min-width="110"
+            >
               <template #default="{ row }">
-                {{ formatFRoleInCaseLabels(row.fRoleInCase) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="Роль обязательства" min-width="160">
-              <template #default="{ row }">
-                {{ formatFCommitmentRoleLabels(row.fCommitmentRole) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="Статус участника" min-width="130">
-              <template #default="{ row }">
-                {{ formatFMemberStatusLabels(row.fMemberStatus) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="Нерезидент" min-width="110">
-              <template #default="{ row }">
-                {{ formatFNoneResidentLabels(row.fNoneResident) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="Тип сегмента" min-width="160">
-              <template #default="{ row }">
-                {{ formatFSegmentTypeLabels(row.fSegmentType) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="КИБ" min-width="80">
-              <template #default="{ row }">
-                {{ formatFKIBLabels(row.fKIB) }}
+                {{ formatDictionaryLabels(field.dictionary, row[field.key]) }}
               </template>
             </el-table-column>
           </el-table>
@@ -64,115 +44,25 @@
               />
             </el-form-item>
 
-            <el-form-item label="Роль в деле (fRoleInCase)">
+            <el-form-item
+              v-for="field in filterFieldConfigs"
+              :key="field.key"
+              :label="`${field.label} (${field.key})`"
+            >
               <el-select
-                v-model="selectedRoleInCaseKeys"
+                :model-value="getFieldKeys(field.key)"
                 multiple
                 clearable
                 collapse-tags
                 collapse-tags-tooltip
-                placeholder="Выберите роли"
+                :placeholder="`Выберите ${field.label.toLowerCase()}`"
                 style="width: 100%"
+                @update:model-value="setFieldKeys(field.key, $event)"
               >
                 <el-option
-                  v-for="item in fRoleInCaseDictionary"
-                  :key="item.key"
-                  :label="item.value"
-                  :value="item.key"
-                />
-              </el-select>
-            </el-form-item>
-
-            <el-form-item label="Роль обязательства (fCommitmentRole)">
-              <el-select
-                v-model="selectedCommitmentRoleKeys"
-                multiple
-                clearable
-                collapse-tags
-                collapse-tags-tooltip
-                placeholder="Выберите роли обязательства"
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="item in fCommitmentRoleDictionary"
-                  :key="item.key"
-                  :label="item.value"
-                  :value="item.key"
-                />
-              </el-select>
-            </el-form-item>
-
-            <el-form-item label="Статус участника (fMemberStatus)">
-              <el-select
-                v-model="selectedMemberStatusKeys"
-                multiple
-                clearable
-                collapse-tags
-                collapse-tags-tooltip
-                placeholder="Выберите статусы участника"
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="item in fMemberStatusDictionary"
-                  :key="item.key"
-                  :label="item.value"
-                  :value="item.key"
-                />
-              </el-select>
-            </el-form-item>
-
-            <el-form-item label="Нерезидент (fNoneResident)">
-              <el-select
-                v-model="selectedNoneResidentKeys"
-                multiple
-                clearable
-                collapse-tags
-                collapse-tags-tooltip
-                placeholder="Выберите значение нерезидента"
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="item in fNoneResidentDictionary"
-                  :key="item.key"
-                  :label="item.value"
-                  :value="item.key"
-                />
-              </el-select>
-            </el-form-item>
-
-            <el-form-item label="Тип сегмента (fSegmentType)">
-              <el-select
-                v-model="selectedSegmentTypeKeys"
-                multiple
-                clearable
-                collapse-tags
-                collapse-tags-tooltip
-                placeholder="Выберите типы сегмента"
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="item in fSegmentTypeDictionary"
+                  v-for="item in field.dictionary"
                   :key="item.key"
                   :label="item.value || `Ключ ${item.key}`"
-                  :value="item.key"
-                />
-              </el-select>
-            </el-form-item>
-
-            <el-form-item label="КИБ (fKIB)">
-              <el-select
-                v-model="selectedKIBKeys"
-                multiple
-                clearable
-                collapse-tags
-                collapse-tags-tooltip
-                placeholder="Выберите значение КИБ"
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="item in fKIBDictionary"
-                  :key="item.key"
-                  :label="item.value"
                   :value="item.key"
                 />
               </el-select>
@@ -211,41 +101,12 @@ import { computed, ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 import {
-  fCommitmentRoleDictionary,
-  formatFCommitmentRoleKeys,
-  formatFCommitmentRoleLabels,
-  parseFCommitmentRoleKeys,
-} from '@/dictionaries/fCommitmentRole';
-import {
-  fKIBDictionary,
-  formatFKIBKeys,
-  formatFKIBLabels,
-  parseFKIBKeys,
-} from '@/dictionaries/fKIB';
-import {
-  fMemberStatusDictionary,
-  formatFMemberStatusKeys,
-  formatFMemberStatusLabels,
-  parseFMemberStatusKeys,
-} from '@/dictionaries/fMemberStatus';
-import {
-  fNoneResidentDictionary,
-  formatFNoneResidentKeys,
-  formatFNoneResidentLabels,
-  parseFNoneResidentKeys,
-} from '@/dictionaries/fNoneResident';
-import {
-  fSegmentTypeDictionary,
-  formatFSegmentTypeKeys,
-  formatFSegmentTypeLabels,
-  parseFSegmentTypeKeys,
-} from '@/dictionaries/fSegmentType';
-import {
-  fRoleInCaseDictionary,
-  formatFRoleInCaseKeys,
-  formatFRoleInCaseLabels,
-  parseFRoleInCaseKeys,
-} from '@/dictionaries/fRoleInCase';
+  filterFieldConfigs,
+  formatDictionaryKeys,
+  formatDictionaryLabels,
+  parseDictionaryKeys,
+} from '@/types/filterDictionaries';
+import type { FilterFieldKey } from '@/types/filterDictionaries';
 import { useFiltersStore } from '@/stores/filters';
 import type { Filter } from '@/types/filter';
 
@@ -265,52 +126,28 @@ const emptyFilter = (): Filter => ({
 
 const currentFilter = ref<Filter>(emptyFilter());
 
-const selectedRoleInCaseKeys = computed({
-  get: () => parseFRoleInCaseKeys(currentFilter.value.fRoleInCase),
-  set: (keys: string[]) => {
-    currentFilter.value.fRoleInCase = formatFRoleInCaseKeys(keys);
-  },
-});
-
-const selectedCommitmentRoleKeys = computed({
-  get: () => parseFCommitmentRoleKeys(currentFilter.value.fCommitmentRole),
-  set: (keys: string[]) => {
-    currentFilter.value.fCommitmentRole = formatFCommitmentRoleKeys(keys);
-  },
-});
-
-const selectedMemberStatusKeys = computed({
-  get: () => parseFMemberStatusKeys(currentFilter.value.fMemberStatus),
-  set: (keys: string[]) => {
-    currentFilter.value.fMemberStatus = formatFMemberStatusKeys(keys);
-  },
-});
-
-const selectedNoneResidentKeys = computed({
-  get: () => parseFNoneResidentKeys(currentFilter.value.fNoneResident),
-  set: (keys: string[]) => {
-    currentFilter.value.fNoneResident = formatFNoneResidentKeys(keys);
-  },
-});
-
-const selectedSegmentTypeKeys = computed({
-  get: () => parseFSegmentTypeKeys(currentFilter.value.fSegmentType),
-  set: (keys: string[]) => {
-    currentFilter.value.fSegmentType = formatFSegmentTypeKeys(keys);
-  },
-});
-
-const selectedKIBKeys = computed({
-  get: () => parseFKIBKeys(currentFilter.value.fKIB),
-  set: (keys: string[]) => {
-    currentFilter.value.fKIB = formatFKIBKeys(keys);
-  },
-});
-
 const isEditing = computed(() => {
   const id = currentFilter.value.id;
   return id !== null && id !== undefined && filtersStore.Get(id) !== undefined;
 });
+
+function getFieldConfig(key: FilterFieldKey) {
+  const field = filterFieldConfigs.find(item => item.key === key);
+  if (!field) {
+    throw new Error(`Неизвестное поле фильтра: ${key}`);
+  }
+  return field;
+}
+
+function getFieldKeys(key: FilterFieldKey): string[] {
+  const field = getFieldConfig(key);
+  return parseDictionaryKeys(field.dictionary, currentFilter.value[key]);
+}
+
+function setFieldKeys(key: FilterFieldKey, keys: string[]): void {
+  const field = getFieldConfig(key);
+  currentFilter.value[key] = formatDictionaryKeys(field.dictionary, keys);
+}
 
 function selectFilter(filter: Filter): void {
   currentFilter.value = { ...filter };
@@ -321,15 +158,21 @@ function resetForm(): void {
 }
 
 function buildPayload(): Filter {
-  return {
+  const payload: Filter = {
     id: currentFilter.value.id,
-    fRoleInCase: formatFRoleInCaseKeys(selectedRoleInCaseKeys.value),
-    fCommitmentRole: formatFCommitmentRoleKeys(selectedCommitmentRoleKeys.value),
-    fMemberStatus: formatFMemberStatusKeys(selectedMemberStatusKeys.value),
-    fNoneResident: formatFNoneResidentKeys(selectedNoneResidentKeys.value),
-    fSegmentType: formatFSegmentTypeKeys(selectedSegmentTypeKeys.value),
-    fKIB: formatFKIBKeys(selectedKIBKeys.value),
+    fRoleInCase: '',
+    fCommitmentRole: '',
+    fMemberStatus: '',
+    fNoneResident: '',
+    fSegmentType: '',
+    fKIB: '',
   };
+
+  for (const field of filterFieldConfigs) {
+    payload[field.key] = formatDictionaryKeys(field.dictionary, getFieldKeys(field.key));
+  }
+
+  return payload;
 }
 
 function saveFilter(): void {
@@ -343,11 +186,10 @@ function saveFilter(): void {
 }
 
 function filterLabel(filter: Filter): string {
-  const parts = [
-    formatFRoleInCaseLabels(filter.fRoleInCase),
-    formatFCommitmentRoleLabels(filter.fCommitmentRole),
-    formatFMemberStatusLabels(filter.fMemberStatus),
-  ].filter(Boolean);
+  const parts = filterFieldConfigs
+    .slice(0, 3)
+    .map(field => formatDictionaryLabels(field.dictionary, filter[field.key]))
+    .filter(Boolean);
 
   if (parts.length > 0) {
     return parts.join(', ');
