@@ -6,8 +6,11 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
+
+
 // https://vite.dev/config/
 export default defineConfig({
+  base: './',     // обязательно с завершающим слешем! настройка относительных путей для деплоя на GitHub Pages
   plugins: [
     vue(),
     vueJsx(),
