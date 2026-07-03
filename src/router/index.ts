@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import ParticipantsFilterView from '../views/ParticipantsFilterView.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -37,7 +38,7 @@ const router = createRouter({
     {
       path: '/participants-filter',
       name: 'participants-filter',
-      component: () => import('../views/ParticipantsFilterView.vue'),
+      component: ParticipantsFilterView,
       meta: { header: 'Participants Filter', description: 'Фильтрация участников.' }
     },
   ]
