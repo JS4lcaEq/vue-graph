@@ -1,0 +1,11 @@
+classDiagram
+class Branch {
+    uid: number
+    uidp: number
+    idp: number
+    id: number
+    nm: string
+}
+class Graph {
+    GetBranch(ParentId: number) Branch[]
+}
