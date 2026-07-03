@@ -1,1 +1,0 @@
-import{_ as e,p as t,t as n,u as r}from"./index-DKi_hgYo.js";var i={},a={id:`about`};function o(n,i){return e(),t(`div`,a,[...i[0]||=[r(`h1`,null,`This is an about page`,-1)]])}var s=n(i,[[`render`,o]]);export{s as default};

@@ -1,1 +1,0 @@
-import{_ as e,b as t,g as n,h as r,m as i,p as a,t as o,u as s,y as c}from"./index-DKi_hgYo.js";var l=o(n({__name:`TestView`,setup(n){return(n,o)=>{let l=c(`el-button`);return e(),a(`div`,null,[o[1]||=s(`p`,null,`Test`,-1),r(l,{type:`primary`},{default:t(()=>[...o[0]||=[i(`Demonstrate Button`,-1)]]),_:1})])}}}),[[`__scopeId`,`data-v-67cb6e16`]]);export{l as default};
