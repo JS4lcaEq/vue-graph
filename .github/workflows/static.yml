@@ -1,0 +1,37 @@
+name: CI/CD для Vue SPA
+
+on:
+  push:
+    branches:
+      - main # Запускать при пуше в ветку main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write # Требуется для того, чтобы Action мог пушить в ветку gh-pages
+
+    steps:
+      # Шаг 1: Получение кода
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Шаг 2: Настройка Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Рекомендуемая версия
+
+      # Шаг 3: Установка зависимостей и Сборка
+      - name: Install dependencies and Build
+        run: |
+          npm install 
+          npm run build # Замените, если ваша команда для сборки другая (например, vite build)
+          
+      # Шаг 4: Развертывание на GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages # Ветка, куда будет загружен собранный код
+          folder: dist      # Папка, созданная командой npm run build
